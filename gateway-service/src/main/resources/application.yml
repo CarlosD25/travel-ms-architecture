@@ -2,7 +2,7 @@ spring:
   cloud:
     gateway:
       server:
-        webmvc:
+        webflux:
           routes:
             - id : itinerary-service
               uri: http://localhost:8081
@@ -10,7 +10,13 @@ spring:
                 - Path=/api/public/itinerary/**
               filters:
                 - RewritePath=/api/public/itinerary/(?<segment>.*), /api/public/itinerary/${segment}
-
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@clientKeyResolver}"
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
+                    redis-rate-limiter.deny-empty-key: true
+                    redis-rate-limiter.empty-key-status-code: 429
 
 
             - id: booking-service
@@ -19,4 +25,14 @@ spring:
                 - Path=/api/public/booking/**
               filters:
                 - RewritePath=/api/public/booking/(?<segment>.*), /api/v1/booking/${segment}
-                
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@clientKeyResolver}"
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
+                    redis-rate-limiter.deny-empty-key: true
+                    redis-rate-limiter.empty-key-status-code: 429
+  data:
+    redis:
+      host: localhost
+      port: 6379
