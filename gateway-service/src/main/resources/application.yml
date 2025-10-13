@@ -17,8 +17,10 @@ spring:
                     redis-rate-limiter.burstCapacity: 10
                     redis-rate-limiter.deny-empty-key: true
                     redis-rate-limiter.empty-key-status-code: 429
-
-
+                - name: CircuitBreaker
+                  args:
+                    name : itineraryCircuitBreaker
+                    fallbackUri: forward:/fallback/itinerary
             - id: booking-service
               uri: http://localhost:8082
               predicates:
@@ -32,7 +34,33 @@ spring:
                     redis-rate-limiter.burstCapacity: 10
                     redis-rate-limiter.deny-empty-key: true
                     redis-rate-limiter.empty-key-status-code: 429
+                - name: CircuitBreaker
+                  args:
+                    name: bookingCircuitBreaker
+                    fallbackUri: forward:/fallback/booking
+
   data:
     redis:
       host: localhost
       port: 6379
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      itineraryCircuitBreaker:
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        automatic-transition-from-open-to-half-open-enabled: true
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+
+      bookingCircuitBreaker:
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        automatic-transition-from-open-to-half-open-enabled: true
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2s
