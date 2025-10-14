@@ -4,19 +4,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/fallback")
 public class FallbackController {
 
-    @GetMapping("/booking")
+    @RequestMapping(value = "/booking", method = {
+            RequestMethod.GET,
+            RequestMethod.POST,
+            RequestMethod.PUT,
+            RequestMethod.PATCH
+    })
     public ResponseEntity<String> bookingFallback() {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(errorMessage("booking-service"));
     }
 
-    @GetMapping("/itinerary")
+    @RequestMapping(value = "/itinerary", method = {
+            RequestMethod.GET,
+            RequestMethod.POST,
+            RequestMethod.PUT,
+            RequestMethod.PATCH
+    })
     public ResponseEntity<String> itineraryFallback() {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(errorMessage("itinerary-service"));
