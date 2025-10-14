@@ -9,14 +9,15 @@ spring:
               predicates:
                 - Path=/api/public/itinerary/**
               filters:
-                - RewritePath=/api/public/itinerary/(?<segment>.*), /api/public/itinerary/${segment}
+                - RewritePath=/api/public/itinerary/(?<segment>.*), /api/itinerary/v1/${segment}
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@clientKeyResolver}"
-                    redis-rate-limiter.replenishRate: 5
-                    redis-rate-limiter.burstCapacity: 10
+                    redis-rate-limiter.replenishRate: 2
+                    redis-rate-limiter.burstCapacity: 5
                     redis-rate-limiter.deny-empty-key: true
                     redis-rate-limiter.empty-key-status-code: 429
+                    redis-rate-limiter.use-prefix: true
                 - name: CircuitBreaker
                   args:
                     name : itineraryCircuitBreaker
@@ -26,14 +27,15 @@ spring:
               predicates:
                 - Path=/api/public/booking/**
               filters:
-                - RewritePath=/api/public/booking/(?<segment>.*), /api/v1/booking/${segment}
+                - RewritePath=/api/public/booking/(?<segment>.*), /api/booking/v1/${segment}
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@clientKeyResolver}"
-                    redis-rate-limiter.replenishRate: 5
-                    redis-rate-limiter.burstCapacity: 10
+                    redis-rate-limiter.replenishRate: 2
+                    redis-rate-limiter.burstCapacity: 5
                     redis-rate-limiter.deny-empty-key: true
                     redis-rate-limiter.empty-key-status-code: 429
+                    redis-rate-limiter.use-prefix: true
                 - name: CircuitBreaker
                   args:
                     name: bookingCircuitBreaker
@@ -48,6 +50,7 @@ resilience4j:
   circuitbreaker:
     instances:
       itineraryCircuitBreaker:
+        minimum-number-of-calls: 10
         sliding-window-size: 5
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
@@ -56,7 +59,9 @@ resilience4j:
         slow-call-rate-threshold: 50
         slow-call-duration-threshold: 2s
 
+
       bookingCircuitBreaker:
+        minimum-number-of-calls: 10
         sliding-window-size: 5
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
@@ -64,3 +69,13 @@ resilience4j:
         automatic-transition-from-open-to-half-open-enabled: true
         slow-call-rate-threshold: 50
         slow-call-duration-threshold: 2s
+
+  timelimiter:
+    instances:
+      itineraryCircuitBreaker:
+        timeout-duration: 5s
+      bookingCircuitBreaker:
+        timeout-duration: 5s
+
+
+
