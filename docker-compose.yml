@@ -1,0 +1,40 @@
+services:
+  gateway:
+    build:
+      context: ./gateway-service
+    container_name: gateway-server
+    ports:
+      - "8080:8080"
+    networks:
+      - test-network
+    depends_on:
+      - itinerary-service
+      - booking-service
+      - redis
+
+  booking-service:
+    build:
+      context: ./booking-service
+    ports:
+      - "8082:8082"
+    networks:
+      - test-network
+
+  itinerary-service:
+    build:
+      context: ./itinerary-service
+    ports:
+      - "8081:8081"
+    networks:
+      - test-network
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - test-network
+
+networks:
+  test-network:
