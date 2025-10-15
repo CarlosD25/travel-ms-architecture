@@ -5,7 +5,7 @@ spring:
         webflux:
           routes:
             - id : itinerary-service
-              uri: http://localhost:8081
+              uri: http://itinerary-service:8081
               predicates:
                 - Path=/api/public/itinerary/**
               filters:
@@ -23,7 +23,7 @@ spring:
                     name : itineraryCircuitBreaker
                     fallbackUri: forward:/fallback/itinerary
             - id: booking-service
-              uri: http://localhost:8082
+              uri: http://booking-service:8082
               predicates:
                 - Path=/api/public/booking/**
               filters:
@@ -43,7 +43,7 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 resilience4j:
