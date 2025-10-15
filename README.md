@@ -22,7 +22,7 @@ Asegúrate de tener instalados los siguientes componentes en tu sistema:
 3.  Ejecuta el siguiente comando para construir las imágenes y levantar todos los servicios en segundo plano:
 
     ```bash
-    docker-compose up --build -d
+    docker compose up --build -d
     ```
 
 4.  Los servicios estarán disponibles en los siguientes puertos en tu `localhost`:
